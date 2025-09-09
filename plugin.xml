@@ -178,9 +178,9 @@
       <feature name="PluginGroundOverlay">
         <param name="android-package" value="plugin.google.maps.PluginGroundOverlay"/>
       </feature>
-      <feature name="PluginKmlOverlay">
+      <!-- <feature name="PluginKmlOverlay">
         <param name="android-package" value="plugin.google.maps.PluginKmlOverlay"/>
-      </feature>
+      </feature> -->
       <feature name="PluginGeocoder">
         <param name="android-package" value="plugin.google.maps.PluginGeocoder"/>
       </feature>
