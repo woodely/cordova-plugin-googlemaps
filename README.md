@@ -508,3 +508,7 @@ This means **you can use the native Google Maps views similar to HTML elements**
 - Gitter : (managed by @Hirbod)
 
   https://gitter.im/nightstomp/cordova-plugin-googlemaps
+
+- Author : Roy Rivera
+
+  I am a software developer at <a href="https://www.wodely.com/">Wodely</a>
