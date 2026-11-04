@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -104,13 +105,15 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface  {
           //--------------------------------------
           // Cancel tasks
           //--------------------------------------
-          AsyncTask task;
-          if (iconLoadingTasks != null && iconLoadingTasks.size() > 0) {
-            int i, ilen = iconLoadingTasks.size();
-            for (i = 0; i < ilen; i++) {
-              task = iconLoadingTasks.get(i);
-              task.cancel(true);
+          if (iconLoadingTasks != null && !iconLoadingTasks.isEmpty()) {
+            for (AsyncTask task : new ArrayList<>(iconLoadingTasks.values())) {
+              if (task != null) {
+                try {
+                  task.cancel(true);
+                } catch (Exception ignored) {}
+              }
             }
+            iconLoadingTasks.clear();
           }
         }
       });
@@ -150,22 +153,26 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface  {
         @Override
         public void run() {
           Set<String> keySet = pluginMap.objects.keys;
-          if (keySet.size() > 0) {
-            String[] objectIdArray = keySet.toArray(new String[keySet.size()]);
-
-            for (String objectId : objectIdArray) {
+          if (keySet != null && !keySet.isEmpty()) {
+            // Copy keys first to avoid concurrent modification
+            List<String> objectIds = new ArrayList<>(keySet);
+            for (String objectId : objectIds) {
+              if (objectId == null) continue;
               if (pluginMap.objects.containsKey(objectId)) {
                 if (objectId.startsWith("marker_") &&
                     !objectId.startsWith("marker_property_") &&
                     !objectId.startsWith("marker_imageSize") &&
                     !objectId.startsWith("marker_icon_")) {
-                  Marker marker = (Marker) pluginMap.objects.remove(objectId);
-                  marker.setTag(null);
-                  marker.remove();
-                  marker = null;
+                  Object obj = pluginMap.objects.remove(objectId);
+                  if (obj instanceof Marker) {
+                    Marker marker = (Marker) obj;
+                    try {
+                      marker.setTag(null);
+                      marker.remove();
+                    } catch (Exception ignored) {}
+                  }
                 } else {
-                  Object object = pluginMap.objects.remove(objectId);
-                  object = null;
+                  pluginMap.objects.remove(objectId);
                 }
               }
             }
