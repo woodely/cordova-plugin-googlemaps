@@ -68,10 +68,12 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface  {
       @Override
       public void run() {
         Set<String> keySet = pluginMap.objects.keys;
-        if (keySet.size() > 0) {
-          String[] objectIdArray = keySet.toArray(new String[keySet.size()]);
+        String[] objectIdArray;
+        synchronized (keySet) {
+          objectIdArray = keySet.toArray(new String[keySet.size()]);
+        }
 
-          for (String objectId : objectIdArray) {
+        for (String objectId : objectIdArray) {
             if (pluginMap.objects.containsKey(objectId)) {
               if (objectId.startsWith("marker_") &&
                   !objectId.startsWith("marker_property_") &&
@@ -85,7 +87,6 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface  {
                 object = null;
               }
             }
-          }
         }
 
         pluginMap.objects.clear();
@@ -154,8 +155,11 @@ public class PluginMarker extends MyPlugin implements MyPluginInterface  {
         public void run() {
           Set<String> keySet = pluginMap.objects.keys;
           if (keySet != null && !keySet.isEmpty()) {
-            // Copy keys first to avoid concurrent modification
-            List<String> objectIds = new ArrayList<>(keySet);
+            // Take a stable snapshot while other threads may mutate the cache.
+            List<String> objectIds;
+            synchronized (keySet) {
+              objectIds = new ArrayList<>(keySet);
+            }
             for (String objectId : objectIds) {
               if (objectId == null) continue;
               if (pluginMap.objects.containsKey(objectId)) {

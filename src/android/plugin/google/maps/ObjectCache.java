@@ -2,10 +2,15 @@ package plugin.google.maps;
 
 import android.util.LruCache;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ObjectCache {
-  public final HashSet<String> keys = new HashSet<String>();
+  // Marker/map objects are added and removed from both the UI and Cordova
+  // worker threads. Keep key-set operations (including toArray snapshots)
+  // synchronized so cleanup cannot race with a mutation.
+  public final Set<String> keys = Collections.synchronizedSet(new HashSet<String>());
   private LruCache<String, Object> objects = new LruCache<String, Object>(10000);
 
   public boolean containsKey(String key) {
@@ -32,10 +37,12 @@ public class ObjectCache {
 
 
   public void clear() {
-    for (String key : keys) {
-      objects.remove(key);
+    synchronized (keys) {
+      for (String key : keys) {
+        objects.remove(key);
+      }
+      keys.clear();
     }
-    keys.clear();
   }
 
   public void destroy() {
