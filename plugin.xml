@@ -251,6 +251,8 @@
       <!-- GPS -->
       <uses-feature android:name="android.hardware.location"/>
       <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+      <!-- Add this section to fix a Google Play warning mssage -->
+      <uses-feature android:name="android.hardware.wifi" android:required="false" />
     </config-file>
 
     <resource-file src="src/android/res/layout/dummy_infowindow.xml" target="res/layout/dummy_infowindow.xml"/>
